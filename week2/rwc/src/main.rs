@@ -10,3 +10,11 @@ fn main() {
     let filename = &args[1];
     // Your code here :)
 }
+
+fn f<'a>(s: &'a str, t: &'a str) -> &'a str {
+    if s.len() > 5 {
+        s
+    } else {
+        t
+    }
+}

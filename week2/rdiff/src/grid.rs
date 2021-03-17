@@ -30,18 +30,33 @@ impl Grid {
     /// but others argue that makes code needlessly complex. Here, we decided to return Option to
     /// give you more practice with Option :) and because this similar library returns Option:
     /// https://docs.rs/array2d/0.2.1/array2d/struct.Array2D.html
-    #[allow(unused)] // TODO: delete this line when you implement this function
     pub fn get(&self, row: usize, col: usize) -> Option<usize> {
-        unimplemented!();
-        // Be sure to delete the #[allow(unused)] line above
+        let r = row as i32;
+        let c = col as i32;
+        if r < 0 || r >= self.num_rows as i32 || c < 0 || c >= self.num_cols as i32 || row * col >= self.elems.len() {
+            return None
+        }
+
+        let result = self.elems[row * self.num_cols + col];
+
+        Some(result)
     }
 
     /// Sets the element at the specified location to the specified value. If the location is out
     /// of bounds, returns Err with an error message.
-    #[allow(unused)] // TODO: delete this line when you implement this function
     pub fn set(&mut self, row: usize, col: usize, val: usize) -> Result<(), &'static str> {
-        unimplemented!();
-        // Be sure to delete the #[allow(unused)] line above
+        // check bounds
+        let r = row as i32;
+        let c = col as i32;
+        if r < 0 || r >= self.num_rows as i32 || c < 0 || c >= self.num_cols as i32 {
+            return Err("row or column is out of bounds");
+        }
+
+        // set the value in the vector
+        // r * n_col + c
+        self.elems[row * self.num_cols + col] = val;
+
+        Ok(())
     }
 
     /// Prints a visual representation of the grid. You can use this for debugging.
