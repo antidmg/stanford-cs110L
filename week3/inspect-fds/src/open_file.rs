@@ -1,5 +1,5 @@
 use regex::Regex;
-use std::collections::hash_map::DefaultHasher;
+use std::{collections::hash_map::DefaultHasher, path::Path};
 use std::hash::{Hash, Hasher};
 #[allow(unused_imports)] // TODO: delete this line for Milestone 4
 use std::{fmt, fs};
@@ -53,7 +53,6 @@ pub struct OpenFile {
 }
 
 impl OpenFile {
-    #[allow(unused)] // TODO: delete this line for Milestone 4
     pub fn new(name: String, cursor: usize, access_mode: AccessMode) -> OpenFile {
         OpenFile {
             name,
@@ -134,10 +133,21 @@ impl OpenFile {
     /// program and we don't need to do fine-grained error handling, so returning Option is a
     /// simple way to indicate that "hey, we weren't able to get the necessary information"
     /// without making a big deal of it.)
-    #[allow(unused)] // TODO: delete this line for Milestone 4
     pub fn from_fd(pid: usize, fd: usize) -> Option<OpenFile> {
-        // TODO: implement for Milestone 4
-        unimplemented!();
+        // name
+        let path_str = format!("/proc/{}/fd/{}", pid.to_string(), fd.to_string());
+        let path = fs::read_link(Path::new(&path_str));
+        let name = OpenFile::path_to_name(path.ok()?.to_str()?);
+
+        // cursor
+        let path_str = format!("/proc/{}/fdinfo/{}", pid.to_string(), fd.to_string());
+        let fdinfo = fs::read_to_string(Path::new(&path_str)).ok()?;
+        let cursor = OpenFile::parse_cursor(&fdinfo.as_str())?;
+
+        // access mode
+        let access_mode = OpenFile::parse_access_mode(&fdinfo.as_str())?;
+
+        Some(OpenFile::new(name, cursor, access_mode))
     }
 
     /// This function returns the OpenFile's name with ANSI escape codes included to colorize
